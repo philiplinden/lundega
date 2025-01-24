@@ -6,6 +6,10 @@ use bevy::{
 };
 use bevy_console::make_layer;
 
+use crate::blockchain;
+use crate::registry;
+use crate::simulation;
+
 pub struct AppPlugin;
 
 impl Plugin for AppPlugin {
@@ -17,28 +21,29 @@ impl Plugin for AppPlugin {
         );
 
         // Default plugins
-        app.add_plugins((
-            DefaultPlugins
-                .set(WindowPlugin {
-                    primary_window: Window {
-                        title: "🏪 L U N D E G A 🌙".to_string(),
-                        canvas: Some("#bevy".to_string()),
-                        fit_canvas_to_parent: true,
-                        prevent_default_event_handling: true,
-                        ..default()
-                    }
-                    .into(),
+        app.add_plugins((DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: Window {
+                    title: "🏪 L U N D E G A 🌙".to_string(),
+                    canvas: Some("#bevy".to_string()),
+                    fit_canvas_to_parent: true,
+                    prevent_default_event_handling: true,
                     ..default()
-                })
-                .set(LogPlugin {
-                    level: log::Level::INFO,
-                    filter: "info,capture_bevy_logs=info".to_owned(),
-                    custom_layer: make_layer,
-                }),
-        ));
+                }
+                .into(),
+                ..default()
+            })
+            .set(LogPlugin {
+                level: log::Level::INFO,
+                filter: "info,capture_bevy_logs=info".to_owned(),
+                custom_layer: make_layer,
+            }),));
 
         // Custom plugins
         app.add_plugins((
+            blockchain::plugin,
+            registry::plugin,
+            simulation::plugin,
             ui::plugin,
         ));
     }
