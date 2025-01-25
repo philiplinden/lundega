@@ -96,16 +96,19 @@ struct ShowInfoCommandsPlugin;
 impl Plugin for ShowInfoCommandsPlugin {
     fn build(&self, app: &mut App) {
         app.add_console_command::<ShowChainCommand, _>(show_chain_command);
-        app.add_console_command::<AllBotsCommand, _>(all_bots_command);
+        app.add_console_command::<ShowBotsCommand, _>(show_bots_command);
     }
 }
 
 #[derive(Parser, ConsoleCommand)]
-#[command(name = "all-bots")]
-struct AllBotsCommand;
+#[command(name = "show-bots")]
+struct ShowBotsCommand;
 
-fn all_bots_command(mut log: ConsoleCommand<AllBotsCommand>, bots: Query<&Name, With<agent::bot::Bot>>) {
-    if let Some(Ok(AllBotsCommand {})) = log.take() {
+fn show_bots_command(
+    mut log: ConsoleCommand<ShowBotsCommand>,
+    bots: Query<&Name, With<agent::bot::Bot>>,
+) {
+    if let Some(Ok(ShowBotsCommand {})) = log.take() {
         log.reply_ok(format!(
             "{}",
             bots.iter()

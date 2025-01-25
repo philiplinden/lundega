@@ -3,7 +3,6 @@
 //! The digital "yellow pages"
 
 pub mod database;
-pub mod schema;
 
 use bevy::prelude::*;
 
