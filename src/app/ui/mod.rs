@@ -1,4 +1,4 @@
-//! Development tools for the game. This plugin is only enabled in dev builds.
+pub mod console;
 
 use bevy::{
     dev_tools::ui_debug_overlay::{DebugUiPlugin, UiDebugOptions},
@@ -8,7 +8,7 @@ use bevy::{
 
 pub(super) fn plugin(app: &mut App) {
     // Toggle the debug overlay for UI.
-    app.add_plugins(DebugUiPlugin);
+    app.add_plugins((DebugUiPlugin, console::plugin));
     app.add_systems(
         Update,
         toggle_debug_ui.run_if(input_just_pressed(TOGGLE_KEY)),

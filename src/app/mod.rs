@@ -2,9 +2,8 @@ pub mod agent;
 pub mod blockchain;
 pub mod registry;
 pub mod ui;
-pub mod console;
-
 use bevy::{
+    app::PluginGroupBuilder,
     log::{self, LogPlugin},
     prelude::*,
 };
@@ -21,26 +20,27 @@ impl Plugin for AppPlugin {
         );
 
         // Default plugins
-        app.add_plugins((DefaultPlugins
-            .set(WindowPlugin {
-                primary_window: Window {
-                    title: "🏪 L U N D E G A 🌙".to_string(),
-                    canvas: Some("#bevy".to_string()),
-                    fit_canvas_to_parent: true,
-                    prevent_default_event_handling: true,
+        app.add_plugins((
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Window {
+                        title: "🏪 L U N D E G A 🌙".to_string(),
+                        canvas: Some("#bevy".to_string()),
+                        fit_canvas_to_parent: true,
+                        prevent_default_event_handling: true,
+                        ..default()
+                    }
+                    .into(),
                     ..default()
-                }
-                .into(),
-                ..default()
-            })
-            .set(LogPlugin {
-                level: log::Level::INFO,
-                filter: "info,capture_bevy_logs=info".to_owned(),
-                custom_layer: make_layer,
-            }),));
-
-        // Custom plugins
-        app.add_plugins((SimulationPlugin, UiPlugin));
+                })
+                .set(LogPlugin {
+                    level: log::Level::INFO,
+                    filter: "info,capture_bevy_logs=info".to_owned(),
+                    custom_layer: make_layer,
+                }),
+            SimulationPlugins,
+            ui::plugin,
+        ));
     }
 }
 
@@ -57,20 +57,13 @@ enum AppSet {
     Update,
 }
 
-/// Plugin for the simulation actions and logic
-struct SimulationPlugin;
+pub struct SimulationPlugins;
 
-impl Plugin for SimulationPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_plugins((agent::plugin, blockchain::plugin, registry::plugin));
-    }
-}
-
-/// Plugin for the UI and console
-struct UiPlugin;
-
-impl Plugin for UiPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_plugins((ui::plugin, console::plugin));
+impl PluginGroup for SimulationPlugins {
+    fn build(self) -> PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>()
+            .add(agent::plugin)
+            .add(blockchain::plugin)
+            .add(registry::plugin)
     }
 }
