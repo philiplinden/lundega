@@ -20,12 +20,12 @@ pub struct Blockchain {
 #[derive(Component, Clone, Debug, Default)]
 pub struct Block {
     pub data: String,
-    pub timestamp: u64,
+    pub timestamp: f32,
 }
 
 impl Block {
-    pub fn new(data: String) -> Self {
-        Self { data, timestamp: 0 }
+    pub fn new(data: String, timestamp: f32) -> Self {
+        Self { data, timestamp }
     }
 }
 
