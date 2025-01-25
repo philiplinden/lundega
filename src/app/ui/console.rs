@@ -5,7 +5,11 @@ use bevy_console::{
 use clap::{Parser, ValueEnum};
 
 use crate::agent;
-use crate::blockchain::{AddBlockEvent, Blockchain};
+use crate::blockchain::{
+    block::{AddBlockEvent, Blockchain},
+    passport::Passport,
+    wallet::Wallet,
+};
 
 const OPEN_BY_DEFAULT: bool = true;
 
@@ -97,6 +101,8 @@ impl Plugin for ShowInfoCommandsPlugin {
     fn build(&self, app: &mut App) {
         app.add_console_command::<ShowChainCommand, _>(show_chain_command);
         app.add_console_command::<ShowBotsCommand, _>(show_bots_command);
+        app.add_console_command::<ShowPassportCommand, _>(show_passport_command);
+        app.add_console_command::<ShowWalletCommand, _>(show_wallet_command);
     }
 }
 
@@ -119,11 +125,59 @@ fn show_bots_command(
     }
 }
 
+/// Check the passport of an entity if they have one
+#[derive(Parser, ConsoleCommand)]
+#[command(name = "show-passport")]
+struct ShowPassportCommand {
+    /// Entity to check passport of
+    entity_id: usize,
+}
+
+fn show_passport_command(
+    mut log: ConsoleCommand<ShowPassportCommand>,
+    passports: Query<&Passport>,
+) {
+    if let Some(Ok(ShowPassportCommand { entity_id })) = log.take() {
+        let entity = Entity::from_raw(entity_id as u32);
+        let passport = passports.get(entity);
+        if let Ok(passport) = passport {
+            log.reply_ok(format!("Entity {}'s passport: {}", entity_id, passport.name));
+        } else {
+            log.reply_failed(format!("Entity {} does not have a passport", entity_id));
+        }
+    }
+}
+
+/// Check the wallet of an entity if they have one
+#[derive(Parser, ConsoleCommand)]
+#[command(name = "show-wallet")]
+struct ShowWalletCommand {
+    /// Entity to check wallet of
+    entity_id: usize,
+}
+
+fn show_wallet_command(
+    mut log: ConsoleCommand<ShowWalletCommand>,
+    wallets: Query<&Wallet>,
+) {
+    if let Some(Ok(ShowWalletCommand { entity_id })) = log.take() {
+        let entity = Entity::from_raw(entity_id as u32);
+        let wallet = wallets.get(entity);
+        if let Ok(wallet) = wallet {
+            log.reply_ok(format!("Entity {}'s wallet: {}", entity_id, wallet.balance));
+        } else {
+            log.reply_failed(format!("Entity {} does not have a wallet", entity_id));
+        }
+    }
+}
+
 struct BlockchainCommandsPlugin;
 
 impl Plugin for BlockchainCommandsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_console_command::<AddBlockCommand, _>(add_block_command);
+        app.add_console_command::<AddBlockCommand, _>(add_block_command)
+            .add_console_command::<AddBalanceCommand, _>(add_balance_command)
+            .add_console_command::<CheckBalanceCommand, _>(check_balance_command);
     }
 }
 
@@ -146,6 +200,56 @@ fn add_block_command(
             data,
         });
         log.ok();
+    }
+}
+
+/// Add a balance to an entity's wallet if they have one
+#[derive(Parser, ConsoleCommand)]
+#[command(name = "add-balance")]
+struct AddBalanceCommand {
+    /// Entity to add balance to
+    entity_id: usize,
+    /// Amount to add
+    amount: f32,
+}
+
+fn add_balance_command(
+    mut log: ConsoleCommand<AddBalanceCommand>,
+    mut wallets: Query<&mut Wallet>,
+) {
+    if let Some(Ok(AddBalanceCommand { entity_id, amount })) = log.take() {
+        // Convert usize entity_id to Entity type
+        let entity = Entity::from_raw(entity_id as u32);
+
+        if let Ok(mut wallet) = wallets.get_mut(entity) {
+            wallet.balance += amount;
+            log.reply_ok(format!("Added {} to entity {}'s wallet. New balance: {}", amount, entity_id, wallet.balance));
+        } else {
+            log.reply_failed(format!("Entity {} does not have a wallet", entity_id));
+        }
+    }
+}
+
+/// Check the balance of an entity's wallet if they have one
+#[derive(Parser, ConsoleCommand)]
+#[command(name = "check-balance")]
+struct CheckBalanceCommand {
+    /// Entity to check balance of
+    entity_id: usize,
+}
+
+fn check_balance_command(
+    mut log: ConsoleCommand<CheckBalanceCommand>,
+    wallets: Query<&Wallet>,
+) {
+    if let Some(Ok(CheckBalanceCommand { entity_id })) = log.take() {
+        let entity = Entity::from_raw(entity_id as u32);
+        let wallet = wallets.get(entity);
+        if let Ok(wallet) = wallet {
+            log.reply_ok(format!("Entity {}'s balance: {}", entity_id, wallet.balance));
+        } else {
+            log.reply_failed(format!("Entity {} does not have a wallet", entity_id));
+        }
     }
 }
 

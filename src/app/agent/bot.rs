@@ -2,7 +2,8 @@
 
 use bevy::prelude::*;
 
-use crate::blockchain::AddBlockEvent;
+use crate::blockchain::Passport;
+use crate::blockchain::Wallet;
 
 pub(super) fn plugin(app: &mut App) {
     // todo
@@ -25,4 +26,16 @@ impl Default for Bot {
 
 pub fn spawn_bot(commands: &mut Commands) -> Entity {
     commands.spawn((Bot::default(),)).id()
+}
+
+fn spawn_wallet_on_add(mut commands: Commands, query: Query<Entity, Added<Bot>>) {
+    for entity in query.iter() {
+        commands.entity(entity).insert(Wallet::new());
+    }
+}
+
+fn spawn_passport_on_add(mut commands: Commands, query: Query<Entity, Added<Bot>>) {
+    for entity in query.iter() {
+        commands.entity(entity).insert(Passport::new());
+    }
 }

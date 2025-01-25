@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use bevy::prelude::*;
 use sha2::{Digest, Sha256};
+use hex;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<Blockchain>()
@@ -33,8 +34,8 @@ pub struct Block {
     pub index: usize,
     pub timestamp: f32,
     pub data: String,
-    pub previous_hash: String,
-    pub hash: String,
+    pub previous_hash: Vec<u8>,
+    pub hash: Vec<u8>,
 }
 
 impl Display for Block {
@@ -42,7 +43,11 @@ impl Display for Block {
         write!(
             f,
             "Block #{}: Hash = {}, Previous Hash = {}, Timestamp = {}, Data = {}",
-            self.index, self.hash, self.previous_hash, self.timestamp, self.data
+            self.index,
+            hex::encode(&self.hash),
+            hex::encode(&self.previous_hash),
+            self.timestamp,
+            self.data
         )
     }
 }
@@ -57,7 +62,7 @@ impl BlockConstructor {
         Self { timestamp, data }
     }
 
-    pub fn build(self, index: usize, previous_hash: String) -> Block {
+    pub fn build(self, index: usize, previous_hash: Vec<u8>) -> Block {
         let timestamp = self.timestamp;
         let data = self.data;
         let hash = calculate_block_hash(index, timestamp, &data, &previous_hash);
@@ -72,20 +77,21 @@ impl BlockConstructor {
 }
 
 // Calculate block hash using SHA-256
-fn calculate_block_hash(index: usize, timestamp: f32, data: &str, previous_hash: &str) -> String {
+fn calculate_block_hash(index: usize, timestamp: f32, data: &str, previous_hash: &[u8]) -> Vec<u8> {
     let mut hasher = Sha256::new();
-    hasher.update(format!("{}{}{}{}", index, timestamp, data, previous_hash));
-    format!("{:x}", hasher.finalize())
+    hasher.update(format!("{}{}{}", index, timestamp, data));
+    hasher.update(previous_hash);
+    hasher.finalize().to_vec()
 }
 
 /// System to create the initial genesis block
 fn create_genesis_block(mut commands: Commands, time: Res<Time>) {
     let genesis_block = Block {
-        index: 0, // Will be set correctly when added to chain
+        index: 0,
         timestamp: time.elapsed_secs(),
         data: "Genesis Block".to_string(),
-        previous_hash: "0".to_string(),
-        hash: calculate_block_hash(0, 0.0, "Genesis Block", "0"),
+        previous_hash: vec![0],
+        hash: calculate_block_hash(0, 0.0, "Genesis Block", &[0]),
     };
     commands.insert_resource(Blockchain {
         chain: vec![genesis_block],
