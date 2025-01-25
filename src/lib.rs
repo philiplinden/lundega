@@ -1,8 +1,3 @@
 mod app;
-mod agent;
-mod blockchain;
-mod registry;
-mod ui;
-mod console;
 
-pub use app::AppPlugin;
+pub use app::{agent, blockchain, console, registry, ui, AppPlugin};

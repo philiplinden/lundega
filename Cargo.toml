@@ -7,7 +7,8 @@ edition = "2021"
 [dependencies]
 bevy = { version = "0.15", features = ["wayland"] }
 rand = "0.8"
-
+tokio = "1.43.0"
+hbbft = { version = "0.1.1", features = ["no-simd"] }
 clap = "4.5.27"
 bevy_console = "0.13.1"
 # Compile low-severity logs out of native builds for performance.
@@ -15,13 +16,6 @@ log = { version = "0.4", features = [
     "max_level_debug",
     "release_max_level_warn",
 ] }
-# Compile low-severity logs out of web builds for performance.
-tracing = { version = "0.1", features = [
-    "max_level_debug",
-    "release_max_level_warn",
-] }
-tokio = "1.43.0"
-hbbft = { version = "0.1.1", features = ["no-simd"] }
 
 [features]
 default = [

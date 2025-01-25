@@ -1,5 +1,4 @@
 pub mod passport;
-pub mod ledger;
 pub mod transaction;
 pub mod wallet;
 pub mod consensus;

@@ -1,14 +1,14 @@
+pub mod agent;
+pub mod blockchain;
+pub mod registry;
+pub mod ui;
+pub mod console;
+
 use bevy::{
     log::{self, LogPlugin},
     prelude::*,
 };
 use bevy_console::make_layer;
-
-use crate::agent;
-use crate::blockchain;
-use crate::console;
-use crate::registry;
-use crate::ui;
 
 pub struct AppPlugin;
 
