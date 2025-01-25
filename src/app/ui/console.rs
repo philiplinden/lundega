@@ -30,8 +30,8 @@ pub(super) fn plugin(app: &mut App) {
     // Add commands plugins
     app.add_plugins((
         SpawnCommandsPlugin,
-        BlockchainCommandsPlugin,
         ShowInfoCommandsPlugin,
+        BlockchainCommandsPlugin,
     ));
 }
 
