@@ -1,14 +1,14 @@
-mod ui;
-
 use bevy::{
     log::{self, LogPlugin},
     prelude::*,
 };
 use bevy_console::make_layer;
 
+use crate::agent;
 use crate::blockchain;
+use crate::console;
 use crate::registry;
-use crate::simulation;
+use crate::ui;
 
 pub struct AppPlugin;
 
@@ -40,12 +40,7 @@ impl Plugin for AppPlugin {
             }),));
 
         // Custom plugins
-        app.add_plugins((
-            blockchain::plugin,
-            registry::plugin,
-            simulation::plugin,
-            ui::plugin,
-        ));
+        app.add_plugins((SimulationPlugin, UiPlugin));
     }
 }
 
@@ -60,4 +55,22 @@ enum AppSet {
     RecordInput,
     /// Do everything else (consider splitting this into further variants).
     Update,
+}
+
+/// Plugin for the simulation actions and logic
+struct SimulationPlugin;
+
+impl Plugin for SimulationPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugins((agent::plugin, blockchain::plugin, registry::plugin));
+    }
+}
+
+/// Plugin for the UI and console
+struct UiPlugin;
+
+impl Plugin for UiPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugins((ui::plugin, console::plugin));
+    }
 }
