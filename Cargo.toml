@@ -11,11 +11,12 @@ tokio = "1.43.0"
 hbbft = { version = "0.1.1", features = ["no-simd"] }
 clap = "4.5.27"
 bevy_console = "0.13.1"
-# Compile low-severity logs out of native builds for performance.
 log = { version = "0.4", features = [
+    # Compile low-severity logs out of native builds for performance.
     "max_level_debug",
     "release_max_level_warn",
 ] }
+sha2 = "0.10.8"
 
 [features]
 default = [

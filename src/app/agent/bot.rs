@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use crate::blockchain::{Block, BlockAddedEvent};
+use crate::blockchain::AddBlockEvent;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, bot_print_time);
@@ -27,7 +27,7 @@ pub fn spawn_bot(commands: &mut Commands) -> Entity {
 }
 
 pub fn bot_print_time(
-    mut events: EventWriter<BlockAddedEvent>,
+    mut events: EventWriter<AddBlockEvent>,
     time: Res<Time>,
     mut query: Query<(&Name, &mut Bot)>,
 ) {
@@ -36,8 +36,10 @@ pub fn bot_print_time(
             if let Ok(current_time) = SystemTime::now().duration_since(UNIX_EPOCH) {
                 bot.message = format!("[Bot {}] Current system time: {:?}", name, current_time);
                 bot.last_print = time.elapsed_secs();
-                let new_block = Block::new(bot.message.clone(), time.elapsed_secs());
-                events.send(BlockAddedEvent { block: new_block });
+                events.send(AddBlockEvent {
+                    timestamp: time.elapsed_secs(),
+                    data: bot.message.clone(),
+                });
             }
         }
     }

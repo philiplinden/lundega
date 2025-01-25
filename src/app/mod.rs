@@ -2,6 +2,7 @@ pub mod agent;
 pub mod blockchain;
 pub mod registry;
 pub mod ui;
+
 use bevy::{
     app::PluginGroupBuilder,
     log::{self, LogPlugin},
