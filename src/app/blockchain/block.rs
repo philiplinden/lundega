@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
 use bevy::prelude::*;
-use sha2::{Digest, Sha256};
 use hex;
+use sha2::{Digest, Sha256};
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<Blockchain>()

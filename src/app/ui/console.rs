@@ -1,7 +1,8 @@
-use bevy::prelude::*;
-use bevy_console::{
-    AddConsoleCommand, ConsoleCommand, ConsoleConfiguration, ConsoleOpen, ConsolePlugin,
+use bevy::{
+    prelude::*,
+    log::{self, LogPlugin},
 };
+use bevy_console::{self, make_layer, AddConsoleCommand, ConsoleCommand, ConsoleConfiguration, ConsoleOpen};
 use clap::{Parser, ValueEnum};
 
 use crate::agent;
@@ -14,7 +15,13 @@ use crate::blockchain::{
 const OPEN_BY_DEFAULT: bool = true;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins(ConsolePlugin)
+    app.add_plugins((
+        bevy_console::ConsolePlugin,
+        LogPlugin {
+            level: log::Level::INFO,
+            filter: "info,capture_bevy_logs=info".to_owned(),
+            custom_layer: make_layer,
+        }))
         .insert_resource(ConsoleOpen {
             open: OPEN_BY_DEFAULT,
         })
@@ -141,7 +148,10 @@ fn show_passport_command(
         let entity = Entity::from_raw(entity_id as u32);
         let passport = passports.get(entity);
         if let Ok(passport) = passport {
-            log.reply_ok(format!("Entity {}'s passport: {}", entity_id, passport.name));
+            log.reply_ok(format!(
+                "Entity {}'s passport: {}",
+                entity_id, passport.name
+            ));
         } else {
             log.reply_failed(format!("Entity {} does not have a passport", entity_id));
         }
@@ -156,10 +166,7 @@ struct ShowWalletCommand {
     entity_id: usize,
 }
 
-fn show_wallet_command(
-    mut log: ConsoleCommand<ShowWalletCommand>,
-    wallets: Query<&Wallet>,
-) {
+fn show_wallet_command(mut log: ConsoleCommand<ShowWalletCommand>, wallets: Query<&Wallet>) {
     if let Some(Ok(ShowWalletCommand { entity_id })) = log.take() {
         let entity = Entity::from_raw(entity_id as u32);
         let wallet = wallets.get(entity);
@@ -223,7 +230,10 @@ fn add_balance_command(
 
         if let Ok(mut wallet) = wallets.get_mut(entity) {
             wallet.balance += amount;
-            log.reply_ok(format!("Added {} to entity {}'s wallet. New balance: {}", amount, entity_id, wallet.balance));
+            log.reply_ok(format!(
+                "Added {} to entity {}'s wallet. New balance: {}",
+                amount, entity_id, wallet.balance
+            ));
         } else {
             log.reply_failed(format!("Entity {} does not have a wallet", entity_id));
         }
@@ -238,15 +248,15 @@ struct CheckBalanceCommand {
     entity_id: usize,
 }
 
-fn check_balance_command(
-    mut log: ConsoleCommand<CheckBalanceCommand>,
-    wallets: Query<&Wallet>,
-) {
+fn check_balance_command(mut log: ConsoleCommand<CheckBalanceCommand>, wallets: Query<&Wallet>) {
     if let Some(Ok(CheckBalanceCommand { entity_id })) = log.take() {
         let entity = Entity::from_raw(entity_id as u32);
         let wallet = wallets.get(entity);
         if let Ok(wallet) = wallet {
-            log.reply_ok(format!("Entity {}'s balance: {}", entity_id, wallet.balance));
+            log.reply_ok(format!(
+                "Entity {}'s balance: {}",
+                entity_id, wallet.balance
+            ));
         } else {
             log.reply_failed(format!("Entity {} does not have a wallet", entity_id));
         }

@@ -5,10 +5,8 @@ pub mod ui;
 
 use bevy::{
     app::PluginGroupBuilder,
-    log::{self, LogPlugin},
     prelude::*,
 };
-use bevy_console::make_layer;
 
 pub struct AppPlugin;
 
@@ -34,11 +32,8 @@ impl Plugin for AppPlugin {
                     .into(),
                     ..default()
                 })
-                .set(LogPlugin {
-                    level: log::Level::INFO,
-                    filter: "info,capture_bevy_logs=info".to_owned(),
-                    custom_layer: make_layer,
-                }),
+                .build()
+                .disable::<bevy::log::LogPlugin>(), // Logging is configured by the ui plugin
             SimulationPlugins,
             ui::plugin,
         ));

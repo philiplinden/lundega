@@ -19,3 +19,9 @@ Within our architecture, we chose to represent each entity via an ERC-721 token,
 and their respective organizations as a Gnosis multisignature wallet. Each
 ERC-721 has roles within the organization tree using Hats Protocol that can
 unlock certain levels of permissions for the organization.
+
+## config and assets
+The population should be generated from a ron file. We can also write the
+current state of the blockchain to a similar ron file. Bevy supports
+hot-reloading of assets, so we can use this to update the population and
+blockchain state without restarting the simulation.
