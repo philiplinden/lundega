@@ -19,7 +19,13 @@ hex = "0.4.3"
 uuid = { version = "1.12.1", features = ["v4"] }
 bevy_console = { version = "0.13.1", optional = true }
 bevy-inspector-egui = { version = "0.29.1", features = ["highlight_changes"], optional = true }
-rusqlite = "0.33.0"
+rusqlite = "0.34.0"
+krabmaga = { version = "0.5.0", features = ["bayesian", "clap", "parallel", "serde", "serde_json", "tokio", "visualization"] }
+bevy_spacetimedb = "0.2.2"
+bevy_common_assets = { version = "0.12.0", features = ["ron", "yaml"] }
+bevy_egui = { version = "0.33.0", features = ["serde"] }
+avian2d = { version = "0.2.1", features = ["serialize"] }
+big-brain = "0.22.0"
 
 [features]
 default = [
